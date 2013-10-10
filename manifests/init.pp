@@ -1,10 +1,16 @@
 class memcached {
-    include epel
-    include remi
-
-    package { 'memcached':
-        ensure  => installed,
-        require => Class['remi'],
+  if $::osfamily == 'RedHat' {
+        include epel
+        include remi
+        package { 'memcached':
+            ensure  => installed,
+            require => Class['remi'],
+        }
+    else {
+       package { 'memcached':
+            ensure  => installed,
+        }
+    }
     }
 
     file { '/etc/init.d/memcached':
