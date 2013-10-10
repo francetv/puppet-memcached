@@ -6,11 +6,11 @@ class memcached {
             ensure  => installed,
             require => Class['remi'],
         }
+    }
     else {
        package { 'memcached':
             ensure  => installed,
         }
-    }
     }
 
     file { '/etc/init.d/memcached':
