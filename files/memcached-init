@@ -19,7 +19,7 @@
 # There is no "status" command.
 
 # Source function library.
-. /etc/rc.d/init.d/functions
+. /lib/lsb/init-functions
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/bin/memcached
@@ -84,7 +84,7 @@ start () {
     $DAEMONBOOTSTRAP /etc/${NAME}.conf $PIDFILE
     RETVAL=$?
     echo
-    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/memcached
+    [ $RETVAL -eq 0 ] && touch /var/lock/memcached
 }
 stop () {
     echo -n "Stopping $DESC: "
@@ -92,7 +92,7 @@ stop () {
     RETVAL=$?
     echo
     if [ $RETVAL -eq 0 ] ; then
-        rm -f /var/lock/subsys/memcached
+        rm -f /var/lock/memcached
         rm -f $PIDFILE
     fi
 }
@@ -115,7 +115,7 @@ case "$1" in
     restart
     ;;
     condrestart)
-    [ -f /var/lock/subsys/memcached ] && restart || :
+    [ -f /var/lock/memcached ] && restart || :
     ;;
     *)
     echo $"Usage: $0 {start|stop|restart|reload|condrestart}"
