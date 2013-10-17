@@ -5,6 +5,7 @@ define memcached::config(
     $connections    = 1024,     # Limit the number of simultaneous incoming connections
 ) {
     file { "/etc/memcached_${name}.conf":
-        content => template('memcached/memcached.conf.erb')
+        content => template('memcached/memcached.conf.erb'),
+        notify  => Service['memcached'],
     }
 }
