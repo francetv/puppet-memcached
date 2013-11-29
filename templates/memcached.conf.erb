@@ -5,5 +5,8 @@
 <% if @listen %>
   -l <%= listen %>
 <% end -%>
+<% if @items_size %>
+  -I <%= @items_size %>m
+<% end -%>
 logfile /var/log/memcached_<%= @name %>.log
 -c <%= @connections %>
