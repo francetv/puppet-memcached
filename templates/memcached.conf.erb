@@ -6,7 +6,7 @@
   -l <%= listen %>
 <% end -%>
 <% if @items_size %>
-  -I <%= @items_size %>m
+  -I <%= @items_size %>
 <% end -%>
 logfile /var/log/memcached_<%= @name %>.log
 -c <%= @connections %>
