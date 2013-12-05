@@ -28,6 +28,12 @@ if (scalar(@ARGV) == 2) {
     $etcfile = shift(@ARGV);
     $pidfile = shift(@ARGV);
 }
+else
+{
+    print STDERR "to be use with ONLY 2 arguments.\n";
+    exit;
+}
+
 
 # If we don't get a valid logfile parameter in the /etc/memcached.conf file,
 # we'll just throw away all of our in-daemon output. We need to re-tie it so

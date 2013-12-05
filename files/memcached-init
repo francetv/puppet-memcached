@@ -38,6 +38,11 @@ then
     exit 0
 fi
 
+if [[ -z "$1" && "$1" != 'start' && "$1" != 'stop' && "$1" != 'restart' && "$1" != 'reload' && "$1" != 'condrestart' ]] ; then
+  echo $"Usage: $0 {start|stop|restart|reload|condrestart}"
+  exit 1
+fi
+
 FILES=(/etc/memcached_*.conf)
 # check for alternative config schema
 if [ -r "${FILES[0]}" ]; then
@@ -67,66 +72,84 @@ if [ -r "${FILES[0]}" ]; then
     echo "Config not exist for: $2" >&2
     exit 1
   fi;
+
+  pid_default=`ps -aux 2>/dev/null | grep '/usr/bin/memcached -m 64 -p 11211 -u nobody -l 127.0.0.1' | grep -v grep | head -n 1 | awk '{print $2}'`
+  if [ ! -z "${pid_default}" ] ; then
+    kill -9 "${pid_default}"
+  fi
+  [ -f '/var/run/memcached.pid' ] && rm -f /var/run/memcached.pid
 else
   CONFIGS=(memcached)
 fi;
+
+
+start () {
+  # TODO: should use daemon function?
+  $DAEMONBOOTSTRAP /etc/${NAME}.conf $PIDFILE
+  RETVAL=$?
+  echo
+  [ $RETVAL -eq 0 ] && touch /var/lock/memcached
+}
+
+stop () {
+  if [ -f $PIDFILE ] ; then
+    ps -aux `cat $PIDFILE` > /dev/null 2>&1
+    if [ $? -eq 0 ] ;  then
+      pkill -F $PIDFILE
+      RETVAL=$?
+    else
+      RETVAL=0
+    fi
+    if [ $RETVAL -eq 0 ] ; then
+      rm -f /var/lock/memcached
+      rm -f $PIDFILE
+    fi
+  else
+    echo " : Instance already stop"
+  fi
+  RETVAL=$?
+  echo
+}
+
+restart () {
+  stop
+  start
+}
+
 
 CONFIG_NUM=${#CONFIGS[@]}
 for ((i=0; i < $CONFIG_NUM; i++)); do
   NAME=${CONFIGS[${i}]}
   PIDFILE="/var/run/${NAME}.pid"
 
-RETVAL=0
+  RETVAL=0
 
-start () {
-    # TODO: should use daemon function?
-    $DAEMONBOOTSTRAP /etc/${NAME}.conf $PIDFILE
-    RETVAL=$?
-    echo
-    [ $RETVAL -eq 0 ] && touch /var/lock/memcached
-}
-stop () {
-    pkill -F $PIDFILE
-    RETVAL=$?
-    echo
-    if [ $RETVAL -eq 0 ] ; then
-        rm -f /var/lock/memcached
-        rm -f $PIDFILE
-    fi
-}
-
-restart () {
-    stop
-    start
-}
-
-
-# See how we were called.
-case "$1" in
+  # See how we were called.
+  case "$1" in
     start)
-      log_begin_msg "Starting $DESC"
+      log_begin_msg "Starting ${NAME} "
       start
       log_end_msg $?
       ;;
     stop)
-      log_begin_msg "Stopping $DESC"
+      log_begin_msg "Stopping ${NAME} "
       stop
       log_end_msg $?
       ;;
     restart|reload)
-      log_begin_msg "Reloading $DESC"
+      log_begin_msg "Reloading ${NAME} "
       restart
       log_end_msg $?
       ;;
     condrestart)
-      log_begin_msg "Restarting $DESC"
+      log_begin_msg "Restarting ${NAME} "
       [ -f /var/lock/memcached ] && restart || :
       log_end_msg $?
       ;;
     *)
-    echo $"Usage: $0 {start|stop|restart|reload|condrestart}"
-    exit 1
-esac
+      echo $"Usage: $0 {start|stop|restart|reload|condrestart}"
+      exit 1
+  esac
 done;
 
 exit $?
