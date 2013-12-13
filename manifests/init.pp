@@ -51,7 +51,7 @@ class memcached {
         ensure      => running,
         enable      => true,
         hasstatus   => false,
-        status      => 'pgrep memcached',
+        status      => '/usr/bin/pgrep memcached',
         require     => [
             Package['memcached'],
             File['memcached-init'],
