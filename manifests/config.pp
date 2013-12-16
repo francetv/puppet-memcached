@@ -21,6 +21,7 @@ define memcached::config(
 
   file { "/etc/memcached_${name}.conf":
     content => template('memcached/memcached.conf.erb'),
+    require => File['/etc/init.d/memcached'],
     notify  => Service['memcached'],
   }
 }
