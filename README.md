@@ -1,8 +1,8 @@
 Puppet Memcached module
 ==============
 
-Tested on Debian 7.
-Tested on CentOS 6.
+* Tested on Debian 7.
+* Tested on CentOS 6.
 
 Dependencies
 --------------

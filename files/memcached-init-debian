@@ -1,8 +1,13 @@
 #! /bin/bash
-#
-# chkconfig: - 55 45
-# description:  The memcached daemon is a network memory cache service.
-# processname: memcached
+### BEGIN INIT INFO
+# Provides:          memcached
+# Required-Start:    hostname $local_fs $network
+# Required-Stop:     hostname $local_fs $network
+# Should-Start:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: start and stop the Memcached deamon
+# Description:       The memcached daemon is a network memory cache service
 ### END INIT INFO
 
 # Usage:
