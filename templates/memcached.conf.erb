@@ -1,12 +1,11 @@
 -m <%= @memory %>
 -p <%= @port %>
 -u memcached
--c 1024
 <% if @listen %>
-  -l <%= listen %>
+-l <%= listen %>
 <% end -%>
 <% if @items_size %>
-  -I <%= @items_size %>
+-I <%= @items_size %>
 <% end -%>
 logfile <%= @dir_log_real %>/memcached_<%= @name %>.log
 -c <%= @connections %>
