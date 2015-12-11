@@ -3,7 +3,7 @@ define memcached::config(
     $memory         = 64,        # Maximum amount of memory to use
     $listen         = false,     # The IP address to listen on, defaults to all
     $connections    = 1024,      # Limit the number of simultaneous incoming connections
-    $items_size     = 1m,        # Max items size
+    $items_size     = '1m',      # Max items size
     $dir_log        = undef,     # Logs's irectory
 ) {
 
