@@ -1,4 +1,7 @@
-class memcached {
+class memcached(
+  $service_ensure = 'running',
+  $service_manage = true
+) {
   if $::osfamily == 'RedHat' {
     include epel
     include remi
@@ -85,9 +88,19 @@ class memcached {
     system => true,
   }
 
+  if ($service_manage) {
+    if $service_ensure == 'running' {
+      $ensure_real = 'running'
+      $enable_real = true
+    } else {
+      $ensure_real = 'stopped'
+      $enable_real = false
+    }
+  }
+
   service { 'memcached':
-    ensure      => running,
-    enable      => true,
+    ensure     => $ensure_real,
+    enable     => $enable_real,
     hasstatus   => false,
     status      => '/usr/bin/pgrep memcached',
     require     => [ Package['memcached'], User['memcached'] ],
