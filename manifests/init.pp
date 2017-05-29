@@ -96,13 +96,12 @@ class memcached(
       $ensure_real = 'stopped'
       $enable_real = false
     }
-  }
-
-  service { 'memcached':
-    ensure     => $ensure_real,
-    enable     => $enable_real,
-    hasstatus   => false,
-    status      => '/usr/bin/pgrep memcached',
-    require     => [ Package['memcached'], User['memcached'] ],
+    service { 'memcached':
+      ensure     => $ensure_real,
+      enable     => $enable_real,
+      hasstatus   => false,
+      status      => '/usr/bin/pgrep memcached',
+      require     => [ Package['memcached'], User['memcached'] ],
+    }
   }
 }
