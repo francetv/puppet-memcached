@@ -26,23 +26,11 @@ define memcached::config(
   }
 
   if $::operatingsystemrelease =~ /^8/ {
-    $systemd_setting = {
-      'Unit' => {
-        'Description'   => 'memcached daemon',
-        'After'         => 'network.target',
-      },
-      'Service' => {
-        'ExecStart'   => "/usr/share/memcached/scripts/systemd-memcached-wrapper /etc/memcached_${name}.conf",
-      },
-      'Install' => {
-        'WantedBy'   => 'multi-user.target',
-      }
-    }
-    $defaults = { 'path' => "/lib/systemd/system/memcached_${name}.service" }
-    create_ini_settings($systemd_setting,  $defaults)
+
+    memcached::systemd{ $name: }
     exec { "Enable memcached_${name}" :
       command => "/bin/systemctl enable memcached_${name}",
-      require => Ftven::Tools::Memcached::Systemd["memcached_${name}"],
+      require => Memcached::Systemd["${name}"],
       notify  => Service["memcached_${name}"],
     }
     service { "memcached_${name}":
