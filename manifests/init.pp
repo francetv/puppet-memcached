@@ -11,10 +11,9 @@ class memcached(
     }
   }
   else {
-    if ! defined(Package['memcached']) {
-      package { 'memcached':
-        ensure  => installed,
-      }
+    package { 'apt-memcached':
+      name    => 'memcached',
+      ensure  => installed,
     }
   }
 
