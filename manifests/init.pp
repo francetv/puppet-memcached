@@ -11,8 +11,10 @@ class memcached(
     }
   }
   else {
-    package { 'memcached':
-      ensure  => installed,
+    if ! defined(Package['memcached']) {
+      package { 'memcached':
+        ensure  => installed,
+      }
     }
   }
 
