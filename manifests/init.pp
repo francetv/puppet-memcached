@@ -1,67 +1,58 @@
 class memcached(
-  $service_ensure = 'running',
-  $service_manage = true
+  $service_manage = true,
+  $service_restart = true,
 ) {
-  if $::osfamily == 'RedHat' {
-    include epel
-    include remi
-    package { 'memcached':
-      ensure  => installed,
-      require => Class['remi'],
-    }
-  }
-  else {
-    package { 'apt-memcached':
-      name    => 'memcached',
-      ensure  => installed,
-    }
+
+  if $package_ensure == 'absent' {
+    $service_ensure = 'stopped'
+    $service_enable = false
+  } else {
+    $service_ensure = 'running'
+    $service_enable = true
   }
 
-  case $::operatingsystem {
-    'Debian', 'Ubuntu': {
-      file { '/etc/init.d/memcached':
-        ensure  => present,
-        source  => 'puppet:///modules/memcached/memcached-init-debian',
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0755',
-        alias   => 'memcached-init',
-        notify  => Service['memcached'],
-        require     => [
-          Package['memcached'],
-          File['/usr/bin/start-memcached'],
-          File['/etc/memcached.conf'],
-        ]
-      }
+  package { $memcached::params::package_name:
+    ensure   => $package_ensure,
+    provider => $memcached::params::package_provider,
+  }
 
-      exec { '/etc/init.d/memcached':
-        command => '/usr/sbin/update-rc.d memcached enable',
-        require => File['/etc/init.d/memcached'],
-      }
+  if $service_restart and $service_manage {
+    $service_notify_real = Service[$memcached::params::service_name]
+  } else {
+    $service_notify_real = undef
+  }
+  if $service_manage {
+    service { $memcached::params::service_name:
+      ensure     => $service_ensure,
+      enable     => $service_enable,
+      hasrestart => true,
+      hasstatus  => $memcached::params::service_hasstatus,
+      status      => '/usr/bin/pgrep memcached',
+      require     => [ Package['memcached'], User['memcached'] ],
     }
-    default: {
-      file { '/etc/init.d/memcached':
-        ensure  => present,
-        source  => 'puppet:///modules/memcached/memcached-init',
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0755',
-        alias   => 'memcached-init',
-        require => Package['memcached'],
-        notify  => Service['memcached'],
-        require     => [
-          Package['memcached'],
-          File['/usr/bin/start-memcached'],
-          File['/etc/memcached.conf'],
-          User['memcached'],
-        ]
-      }
+  }
 
-      exec { '/etc/init.d/memcached':
-        command => '/usr/sbin/chkconfig memcached on',
-        require => File['/etc/init.d/memcached'],
-      }
-    }
+  file { '/etc/init.d/memcached':
+    ensure  => present,
+    source  => "puppet:///modules/memcached/${memcached::params::service_name}",
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    alias   => 'memcached-init',
+    notify  => $service_manage ? {
+      true => Service[$memcached::params::service_name],
+      false => undef
+    },
+    require => [
+      Package[$memcached::params::package_name],
+      File['/usr/bin/start-memcached'],
+      File[$memcached::params::config_file],
+      User['memcached'],
+    ]
+  }
+  exec { '/etc/init.d/memcached':
+    command => $memcached::params::ext_tool_enable,
+    require => File['/etc/init.d/memcached'],
   }
 
   file { '/usr/bin/start-memcached':
@@ -71,38 +62,21 @@ class memcached(
     group   => 'root',
     mode    => '0755',
     alias   => 'memcached-bin',
-    require => Package['memcached'],
+    require => Package[$memcached::params::package_name],
   }
 
-  file { '/etc/memcached.conf':
+  file { $memcached::params::config_file :
     ensure  => present,
     source  => 'puppet:///modules/memcached/memcached.conf',
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
     alias   => 'memcached-conf',
-    require => Package['memcached'],
+    require => Package[$memcached::params::package_name],
   }
 
   user { 'memcached':
     ensure => present,
     system => true,
-  }
-
-  if ($service_manage) {
-    if $service_ensure == 'running' {
-      $ensure_real = 'running'
-      $enable_real = true
-    } else {
-      $ensure_real = 'stopped'
-      $enable_real = false
-    }
-    service { 'memcached':
-      ensure     => $ensure_real,
-      enable     => $enable_real,
-      hasstatus   => false,
-      status      => '/usr/bin/pgrep memcached',
-      require     => [ Package['memcached'], User['memcached'] ],
-    }
   }
 }

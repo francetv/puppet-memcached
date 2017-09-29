@@ -1,10 +1,10 @@
 define memcached::config(
-    $port           = 11211,     # Port number to listen on
-    $memory         = 64,        # Maximum amount of memory to use
-    $listen         = false,     # The IP address to listen on, defaults to all
-    $connections    = 1024,      # Limit the number of simultaneous incoming connections
-    $items_size     = '1m',      # Max items size
-    $dir_log        = undef,     # Logs's irectory
+  $port           = 11211,     # Port number to listen on
+  $memory         = 64,        # Maximum amount of memory to use
+  $listen         = false,     # The IP address to listen on, defaults to all
+  $connections    = 1024,      # Limit the number of simultaneous incoming connections
+  $items_size     = '1m',      # Max items size
+  $dir_log        = undef,     # Logs's irectory
 ) {
 
   if $dir_log {
@@ -20,13 +20,12 @@ define memcached::config(
   }
 
   file { "/etc/memcached_${name}.conf":
-    content => template('memcached/memcached.conf.erb'),
+    content => template($memcached::params::config_tmpl),
     require => File['/etc/init.d/memcached'],
     notify  => Service['memcached'],
   }
 
   if $::operatingsystemrelease =~ /^8/ {
-
     memcached::systemd{ $name: }
     exec { "Enable memcached_${name}" :
       command => "/bin/systemctl enable memcached_${name}",

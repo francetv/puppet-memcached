@@ -1,11 +1,51 @@
--m <%= @memory %>
--p <%= @port %>
--u memcached
-<% if @listen %>
--l <%= listen %>
+<% if @unix_socket -%>
+# UNIX socket path to listen on
+-s <%= @unix_socket %>
+<% else -%>
+
+<% if @listen -%>
+# IP to listen on
+-l <%= @listen %>
 <% end -%>
-<% if @items_size %>
+
+# TCP port to listen on
+-p <%= @port %>
+
+# UDP port to listen on
+-U <%= @udp_port %>
+<% end -%>
+
+logfile <%= @dir_log_real %>/memcached_<%= @name %>.log
+
+# Use <num> MB memory max to use for object storage.
+-m <%= @memory %>
+
+# Limit the number of simultaneous incoming connections.
+-c <%= @connections %>
+
+# Number of threads to use to process incoming requests.
+-t <%= @processorcount %>
+
+<% if @items_size -%>
+# Override  the  default size of each slab page
 -I <%= @items_size %>
 <% end -%>
-logfile <%= @dir_log_real %>/memcached_<%= @name %>.log
--c <%= @connections %>
+
+<% if @min_item_size -%>
+# Override  the  default size of each slab page
+-n <%= @min_item_size %>
+<% end -%>
+
+<% if @factor -%>
+# Override the default factor
+-f <%= @factor %>
+<% end -%>
+
+<% if @auto_removal -%>
+# Disable automatic removal of items from the cache when out of memory
+-M
+<% end -%>
+
+<% if @extended_opts -%>
+-o <%= @extended_opts.join(',') -%>
+<% end -%>
