@@ -39,7 +39,7 @@ class memcached(
     group   => 'root',
     mode    => '0755',
     alias   => 'memcached-init',
-    notify  => $service_notify_real,,
+    notify  => $service_notify_real,
     require => [
       Package[$memcached::params::package_name],
       File['/usr/bin/start-memcached'],
