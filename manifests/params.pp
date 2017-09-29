@@ -15,7 +15,7 @@ class memcached::params {
       $logfile           = '/var/log/memcached.log'
       $use_registry      = false
       $use_svcprop       = false
-      $ext_tool_enable   = "/usr/sbin/update-rc.d #{service_name} enable"
+      $ext_tool_enable   = "/usr/sbin/update-rc.d ${service_name} enable"
     }
     /RedHat|Suse/: {
       $package_name      = 'memcached'
