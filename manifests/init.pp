@@ -1,7 +1,7 @@
 class memcached(
   $service_manage = true,
   $service_restart = true,
-) {
+) inherits memcached::params {
 
   if $package_ensure == 'absent' {
     $service_ensure = 'stopped'
