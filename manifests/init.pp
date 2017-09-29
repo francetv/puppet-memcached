@@ -34,7 +34,7 @@ class memcached(
 
   file { '/etc/init.d/memcached':
     ensure  => present,
-    source  => "puppet:///modules/memcached/${memcached::params::service_name}",
+    source  => "puppet:///modules/memcached/${memcached::params::init_file}",
     owner   => 'root',
     group   => 'root',
     mode    => '0755',
