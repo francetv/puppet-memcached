@@ -22,7 +22,7 @@ define memcached::config(
   file { "/etc/memcached_${name}.conf":
     content => template($memcached::params::config_tmpl),
     require => File['/etc/init.d/memcached'],
-    notify  => Service['memcached'],
+    notify  => Service["memcached_${name}"],
   }
 
   if $::operatingsystemrelease =~ /^8/ {
