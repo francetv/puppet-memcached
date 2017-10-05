@@ -32,12 +32,12 @@ define memcached::config(
       require => Memcached::Systemd["${name}"],
       notify  => Service["memcached_${name}"],
     }
-    service { "memcached_${name}":
-      ensure      => running,
-      enable      => true,
-      hasstatus   => false,
-      status      => "/usr/bin/pgrep memcached_${name}",
-      require     => [ Package['memcached'], User['memcached'] ],
-    }
+  }
+  service { "memcached_${name}":
+    ensure      => running,
+    enable      => true,
+    hasstatus   => false,
+    status      => "/usr/bin/pgrep memcached_${name}",
+    require     => [ Package['memcached'], User['memcached'] ],
   }
 }
