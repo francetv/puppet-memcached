@@ -33,11 +33,15 @@ define memcached::config(
       notify  => Service["memcached_${name}"],
     }
   }
+  
   service { "memcached_${name}":
     ensure      => running,
     enable      => true,
     hasstatus   => false,
-    status      => "/usr/bin/pgrep memcached_${name}",
+    status      => $::operatingsystemrelease ? {
+      /^8/    => "/usr/bin/pgrep memcached_${name}",
+      default => "/usr/bin/pgrep memcached",
+    },
     require     => [ Package['memcached'], User['memcached'] ],
   }
 }
