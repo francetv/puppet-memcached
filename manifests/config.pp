@@ -25,7 +25,7 @@ define memcached::config(
     notify  => Service["memcached_${name}"],
   }
 
-  if $::operatingsystemrelease =~ /^8/ {
+  if $::operatingsystemrelease =~ /^(8|9)/ {
     memcached::systemd{ $name: }
     exec { "Enable memcached_${name}" :
       command => "/bin/systemctl enable memcached_${name}",
