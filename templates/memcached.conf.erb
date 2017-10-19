@@ -11,9 +11,13 @@
 # TCP port to listen on
 -p <%= @port %>
 
+<% if @udp_port -%>
 # UDP port to listen on
 -U <%= @udp_port %>
 <% end -%>
+<% end -%>
+
+-u memcached
 
 logfile <%= @dir_log_real %>/memcached_<%= @name %>.log
 
