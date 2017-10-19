@@ -39,7 +39,7 @@ define memcached::config(
     enable      => true,
     hasstatus   => false,
     status      => $::operatingsystemrelease ? {
-      /^8/    => "/usr/bin/pgrep memcached_${name}",
+      /^(8|9)/    => "/usr/bin/pgrep memcached_${name}",
       default => "/usr/bin/pgrep memcached",
     },
     require     => [ Package['memcached'], User['memcached'] ],
