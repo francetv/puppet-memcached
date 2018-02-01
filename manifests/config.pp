@@ -27,9 +27,9 @@ define memcached::config(
 
   if $::service_provider == 'systemd'{
     memcached::systemd{ $name: }
-    exec { "Reload systemd" :
+    exec { "Reload systemd  memcached_${name}" :
       command => '/bin/systemctl daemon-reload',
-      before => Exec["Enable memcached systemd"]
+      before => Exec["EEnable memcached_${name} systemd"]
     }
     exec { "Enable memcached_${name} systemd" :
       command => '/bin/systemctl enable memcached_${name}',

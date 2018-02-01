@@ -22,9 +22,9 @@ class memcached(
     if $::service_provider == 'systemd'{
       exec { "Reload systemd memcached" :
         command => '/bin/systemctl daemon-reload',
-        before => Exec["Enable memcached systemd"]
+        before => Exec["Disabled memcached systemd"]
       }
-      exec { "disabled memcached systemd" :
+      exec { "Disabled memcached systemd" :
         command => '/bin/systemctl disable memcached',
         onlyif  => "/bin/systemctl is-enabled memcached | /bin/grep 'enabled'",
       }
