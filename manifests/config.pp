@@ -25,15 +25,20 @@ define memcached::config(
     notify  => Service["memcached_${name}"],
   }
 
-  if $::operatingsystemrelease =~ /^(8|9)/ {
+  if $::service_provider == 'systemd'{
     memcached::systemd{ $name: }
-    exec { "Enable memcached_${name}" :
-      command => "/bin/systemctl enable memcached_${name}",
+    exec { "Reload systemd" :
+      command => '/bin/systemctl daemon-reload',
+      before => Exec["Enable memcached systemd"]
+    }
+    exec { "Enable memcached_${name} systemd" :
+      command => '/bin/systemctl enable memcached_${name}',
+      onlyif  => "/bin/systemctl is-enabled memcached | /bin/grep 'disabled'",
       require => Memcached::Systemd["${name}"],
-      notify  => Service["memcached_${name}"],
+      before  => Service["memcached_${name}"],
     }
   }
-  
+
   service { "memcached_${name}":
     ensure      => running,
     enable      => true,
