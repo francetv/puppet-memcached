@@ -20,7 +20,7 @@ class memcached(
     $service_notify_real = Service[$memcached::params::service_name]
   } else {
     if $::service_provider == 'systemd'{
-      exec { "Reload systemd" :
+      exec { "Reload systemd memcached" :
         command => '/bin/systemctl daemon-reload',
         before => Exec["Enable memcached systemd"]
       }
