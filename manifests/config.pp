@@ -31,7 +31,7 @@ define memcached::config(
       before => Exec["Enable memcached_${name} systemd"]
     }
     exec { "Enable memcached_${name} systemd" :
-      command => '/bin/systemctl enable memcached_${name}',
+      command => "/bin/systemctl enable memcached_${name}",
       onlyif  => "/bin/systemctl is-enabled memcached | /bin/grep 'disabled'",
       require => Memcached::Systemd["${name}"],
       before  => Service["memcached_${name}"],
