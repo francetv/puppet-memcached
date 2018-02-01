@@ -21,7 +21,6 @@ define memcached::config(
 
   file { "/etc/memcached_${name}.conf":
     content => template($memcached::params::config_tmpl),
-    require => File['/etc/init.d/memcached'],
     notify  => Service["memcached_${name}"],
   }
 
@@ -29,7 +28,7 @@ define memcached::config(
     memcached::systemd{ $name: }
     exec { "Reload systemd  memcached_${name}" :
       command => '/bin/systemctl daemon-reload',
-      before => Exec["EEnable memcached_${name} systemd"]
+      before => Exec["Enable memcached_${name} systemd"]
     }
     exec { "Enable memcached_${name} systemd" :
       command => '/bin/systemctl enable memcached_${name}',
