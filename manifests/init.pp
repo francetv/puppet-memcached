@@ -24,6 +24,11 @@ class memcached(
         command => '/bin/systemctl daemon-reload',
         before => Exec["Disabled memcached systemd"]
       }
+      exec { "Stop memcached systemd" :
+        command => '/bin/systemctl stop memcached',
+        onlyif  => "/bin/systemctl is-active memcached | /bin/grep 'active'",
+        before => Exec["Disabled memcached systemd"]
+      }
       exec { "Disabled memcached systemd" :
         command => '/bin/systemctl disable memcached',
         onlyif  => "/bin/systemctl is-enabled memcached | /bin/grep 'enabled'",
@@ -84,7 +89,6 @@ class memcached(
       require => Package[$memcached::params::package_name],
     }
   }
-
 
   user { 'memcached':
     ensure => present,
