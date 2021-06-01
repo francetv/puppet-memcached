@@ -1,6 +1,7 @@
-class memcached(
-  $service_manage = true,
-  $service_restart = true,
+class memcached (
+  Enum['present', 'latest', 'absent'] $package_ensure = 'present',
+  $service_manage                                     = true,
+  $service_restart                                    = true,
 ) inherits memcached::params {
 
   if $package_ensure == 'absent' {
@@ -19,17 +20,17 @@ class memcached(
   if $service_restart and $service_manage {
     $service_notify_real = Service[$memcached::params::service_name]
   } else {
-    if $::service_provider == 'systemd'{
-      exec { "Reload systemd memcached" :
+    if $::service_provider == 'systemd' {
+      exec { "Reload systemd memcached":
         command => '/bin/systemctl daemon-reload',
-        before => Exec["Disabled memcached systemd"]
+        before  => Exec["Disabled memcached systemd"]
       }
-      exec { "Stop memcached systemd" :
+      exec { "Stop memcached systemd":
         command => '/bin/systemctl stop memcached',
         onlyif  => "/bin/systemctl is-active memcached | /bin/grep 'active'",
-        before => Exec["Disabled memcached systemd"]
+        before  => Exec["Disabled memcached systemd"]
       }
-      exec { "Disabled memcached systemd" :
+      exec { "Disabled memcached systemd":
         command => '/bin/systemctl disable memcached',
         onlyif  => "/bin/systemctl is-enabled memcached | /bin/grep 'enabled'",
       }
@@ -38,7 +39,7 @@ class memcached(
   }
   if $service_manage {
 
-    file { $memcached::params::config_file :
+    file { $memcached::params::config_file:
       ensure  => present,
       source  => 'puppet:///modules/memcached/memcached.conf',
       owner   => 'root',
@@ -53,12 +54,12 @@ class memcached(
       enable     => $service_enable,
       hasrestart => true,
       hasstatus  => $memcached::params::service_hasstatus,
-      status      => '/usr/bin/pgrep memcached',
-      require     => [ Package['memcached'], User['memcached'] ],
+      status     => '/usr/bin/pgrep memcached',
+      require    => [ Package['memcached'], User['memcached'] ],
     }
   }
 
-  if $::service_provider != 'systemd'{
+  if $::service_provider != 'systemd' {
     file { '/etc/init.d/memcached':
       ensure  => present,
       source  => "puppet:///modules/memcached/${memcached::params::init_file}",
